@@ -777,8 +777,17 @@ mini_llvm_init_method (MonoAotFileInfo *info, gpointer aot_module, gpointer meth
 	MonoAotModule *amodule = (MonoAotModule *)aot_module;
 	ERROR_DECL (error);
 
+#ifndef DISABLE_AOT
 	res = mono_aot_init_llvm_method (amodule, method_info, vtable ? vtable->klass : NULL, error);
+#else
+	mono_aot_init_llvm_method (amodule, 0);
+#endif
+
+#ifndef DISABLE_AOT
 	if (!res || !is_ok (error)) {
+#else
+	if (!is_ok (error)) {
+#endif
 		MonoException *ex = mono_error_convert_to_exception (error);
 		if (ex) {
 			/* Its okay to raise in llvmonly mode */

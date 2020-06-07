@@ -697,7 +697,11 @@ common_call_trampoline (host_mgreg_t *regs, guint8 *code, MonoMethod *m, MonoVTa
 			*vtable_slot_to_patch = mono_get_addr_from_ftnptr (addr);
 		}
 	} else {
+#ifndef DISABLE_AOT
 		guint8 *plt_entry = mono_aot_get_plt_entry (regs, code);
+#else
+		guint8 *plt_entry = mono_aot_get_plt_entry (code);
+#endif
 		gboolean no_patch = FALSE;
 		MonoJitInfo *target_ji;
 

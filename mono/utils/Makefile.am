@@ -282,6 +282,10 @@ if MIPS
 arch_sources += mono-hwcap-mips.c
 endif
 
+if MIPS64
+arch_sources += mono-hwcap-mips.c
+endif
+
 if POWERPC
 arch_sources += mono-hwcap-ppc.c
 endif

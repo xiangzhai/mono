@@ -14,9 +14,11 @@
 #elif _MIPS_SIM == _ABIN32
 /* n32 under development */
 #warning "MIPS using n32 - under development"
+#elif _MIPS_SIM == _ABI64
+/* n64 under development */
+#warning "MIPS using n64 - under development"
 #else
 /* o64 not supported */
-/* n64 not supported */
 #error "MIPS unsupported ABI"
 #endif
 
@@ -63,7 +65,7 @@ typedef gdouble		mips_freg;
 			 (1 << mips_t5) | \
 			 (1 << mips_t6) | \
 			 (1 << mips_t7))
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 #define MIPS_T_REGS	((1 << mips_t0) | \
 			 (1 << mips_t1) | \
 			 (1 << mips_t2) | \
@@ -85,7 +87,7 @@ typedef gdouble		mips_freg;
 			 (1 << mips_a1) | \
 			 (1 << mips_a2) | \
 			 (1 << mips_a3))
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 #define MIPS_A_REGS	((1 << mips_a0) | \
 			 (1 << mips_a1) | \
 			 (1 << mips_a2) | \
@@ -154,6 +156,40 @@ typedef gdouble		mips_freg;
 					 MIPS_FP_PAIR(mips_f22) |	\
 					 MIPS_FP_PAIR(mips_f23) |	\
 					 MIPS_FP_PAIR(mips_f24) |	\
+					 MIPS_FP_PAIR(mips_f25) |	\
+					 MIPS_FP_PAIR(mips_f26) |	\
+					 MIPS_FP_PAIR(mips_f27) |	\
+					 MIPS_FP_PAIR(mips_f28) |	\
+					 MIPS_FP_PAIR(mips_f29) |	\
+					 MIPS_FP_PAIR(mips_f30) |	\
+					 MIPS_FP_PAIR(mips_f31))
+#elif _MIPS_SIM == _ABI64
+#define MONO_ARCH_CALLEE_FREGS		(MIPS_FP_PAIR(mips_f0) |	\
+					 MIPS_FP_PAIR(mips_f1) |	\
+					 MIPS_FP_PAIR(mips_f2) |	\
+					 MIPS_FP_PAIR(mips_f3) |	\
+					 MIPS_FP_PAIR(mips_f4) |	\
+					 MIPS_FP_PAIR(mips_f5) |	\
+					 MIPS_FP_PAIR(mips_f6) |	\
+					 MIPS_FP_PAIR(mips_f7) |	\
+					 MIPS_FP_PAIR(mips_f8) |	\
+					 MIPS_FP_PAIR(mips_f9) |	\
+					 MIPS_FP_PAIR(mips_f10) |	\
+					 MIPS_FP_PAIR(mips_f11) |	\
+					 MIPS_FP_PAIR(mips_f12) |	\
+					 MIPS_FP_PAIR(mips_f13) |	\
+					 MIPS_FP_PAIR(mips_f14) |	\
+					 MIPS_FP_PAIR(mips_f15) |	\
+					 MIPS_FP_PAIR(mips_f16) |	\
+					 MIPS_FP_PAIR(mips_f17) |	\
+					 MIPS_FP_PAIR(mips_f18) |	\
+					 MIPS_FP_PAIR(mips_f19) |	\
+					 MIPS_FP_PAIR(mips_f20) |	\
+					 MIPS_FP_PAIR(mips_f21) |	\
+					 MIPS_FP_PAIR(mips_f22) |	\
+					 MIPS_FP_PAIR(mips_f23))
+
+#define MONO_ARCH_CALLEE_SAVED_FREGS	(MIPS_FP_PAIR(mips_f24) |	\
 					 MIPS_FP_PAIR(mips_f25) |	\
 					 MIPS_FP_PAIR(mips_f26) |	\
 					 MIPS_FP_PAIR(mips_f27) |	\
@@ -266,6 +302,11 @@ typedef struct MonoCompileArch {
 #elif _MIPS_SIM == _ABIN32
 #define MIPS_FIRST_ARG_REG	mips_a0
 #define MIPS_LAST_ARG_REG	mips_t3
+#define MIPS_FIRST_FPARG_REG	mips_f12
+#define MIPS_LAST_FPARG_REG	mips_f19
+#elif _MIPS_SIM == _ABI64
+#define MIPS_FIRST_ARG_REG	mips_a0
+#define MIPS_LAST_ARG_REG	mips_a7
 #define MIPS_FIRST_FPARG_REG	mips_f12
 #define MIPS_LAST_FPARG_REG	mips_f19
 #endif

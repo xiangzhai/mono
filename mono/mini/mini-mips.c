@@ -26,7 +26,11 @@
 #include <mono/arch/mips/mips-codegen.h>
 
 #include "mini-mips.h"
+#if MIPS
 #include "cpu-mips.h"
+#else
+#include "cpu-mips64.h"
+#endif
 #include "ir-emit.h"
 #include "aot-runtime.h"
 #include "mini-runtime.h"
@@ -406,7 +410,7 @@ mono_arch_regname (int reg) {
 		"t8", "t9", "k0", "k1",
 		"gp", "sp", "fp", "ra"
 	};
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 	static const char * rnames[] = {
 		"zero", "at", "v0", "v1",
 		"a0", "a1", "a2", "a3",
@@ -916,9 +920,9 @@ add_float64_arg (CallInfo *info, ArgInfo *ainfo) {
 	}
 	info->stack_size += 8;
 }
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 /*
- * N32 calling convention version
+ * N32/N64 calling convention version
  */
 
 static void
@@ -1571,7 +1575,7 @@ mono_arch_allocate_vars (MonoCompile *cfg)
 #endif
 		}
 	}
-#if _MIPS_SIM == _ABIN32
+#if _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 	/* Now add space for saving the ra */
 	offset += TARGET_SIZEOF_VOID_P;
 
@@ -3104,7 +3108,7 @@ emit_load_volatile_arguments(MonoCompile *cfg, guint8 *code)
 #if _MIPS_SIM == _ABIO32
 					mips_lwc1 (code, ainfo->reg, inst->inst_basereg, inst->inst_offset + ls_word_offset);
 					mips_lwc1 (code, ainfo->reg+1, inst->inst_basereg, inst->inst_offset + ms_word_offset);
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 					mips_ldc1 (code, ainfo->reg, inst->inst_basereg, inst->inst_offset);
 #endif
 				}
@@ -4151,7 +4155,7 @@ mono_arch_output_basic_block (MonoCompile *cfg, MonoBasicBlock *bb)
 #if _MIPS_SIM == _ABIO32
 				mips_swc1 (code, ins->sreg1, ins->inst_destbasereg, ins->inst_offset + ls_word_offset);
 				mips_swc1 (code, ins->sreg1+1, ins->inst_destbasereg, ins->inst_offset + ms_word_offset);
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 				mips_sdc1 (code, ins->sreg1, ins->inst_destbasereg, ins->inst_offset);
 #endif
 			} else {
@@ -4166,7 +4170,7 @@ mono_arch_output_basic_block (MonoCompile *cfg, MonoBasicBlock *bb)
 #if _MIPS_SIM == _ABIO32
 				mips_lwc1 (code, ins->dreg, ins->inst_basereg, ins->inst_offset + ls_word_offset);
 				mips_lwc1 (code, ins->dreg+1, ins->inst_basereg, ins->inst_offset + ms_word_offset);
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 				mips_ldc1 (code, ins->dreg, ins->inst_basereg, ins->inst_offset);
 #endif
 			} else {
@@ -4207,7 +4211,7 @@ mono_arch_output_basic_block (MonoCompile *cfg, MonoBasicBlock *bb)
 #if _MIPS_SIM == _ABIO32
 			mips_lwc1 (code, ins->dreg, mips_at, ls_word_offset);
 			mips_lwc1 (code, ins->dreg+1, mips_at, ms_word_offset);
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 			mips_ldc1 (code, ins->dreg, mips_at, 0);
 #endif
 			break;
@@ -4226,7 +4230,7 @@ mono_arch_output_basic_block (MonoCompile *cfg, MonoBasicBlock *bb)
 #if _MIPS_SIM == _ABIO32
 			mips_swc1 (code, ins->sreg1, mips_at, ls_word_offset);
 			mips_swc1 (code, ins->sreg1+1, mips_at, ms_word_offset);
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 			mips_sdc1 (code, ins->sreg1, mips_at, 0);
 #endif
 			break;
@@ -4972,7 +4976,7 @@ mono_arch_emit_prolog (MonoCompile *cfg)
 #if _MIPS_SIM == _ABIO32
 					mips_swc1 (code, ainfo->reg, inst->inst_basereg, inst->inst_offset + ls_word_offset);
 					mips_swc1 (code, ainfo->reg+1, inst->inst_basereg, inst->inst_offset + ms_word_offset);
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 					mips_sdc1 (code, ainfo->reg, inst->inst_basereg, inst->inst_offset);
 #endif
 				}
@@ -5349,8 +5353,13 @@ mono_arch_build_imt_trampoline (MonoVTable *vtable, MonoDomain *domain, MonoIMTC
 	}
 	start = code;
 
+#if _MIPS_SIM == _ABIO32
 	/* t7 points to the vtable */
 	mips_load_const (code, mips_t7, (gsize)(& (vtable->vtable [0])));
+#else
+	/* t3 points to the vtable */
+	mips_load_const (code, mips_t3, (gsize)(& (vtable->vtable [0])));
+#endif
 
 	for (i = 0; i < count; ++i) {
 		MonoIMTCheckItem *item = imt_entries [i];
@@ -5367,8 +5376,13 @@ mono_arch_build_imt_trampoline (MonoVTable *vtable, MonoDomain *domain, MonoIMTC
 							 item->value.target_code);
 				}
 				else {
+#if _MIPS_SIM == _ABIO32
 					mips_lw (code, mips_t9, mips_t7,
 						(sizeof (target_mgreg_t) * item->value.vtable_slot));
+#else
+					mips_lw (code, mips_t9, mips_t3,
+						(sizeof (target_mgreg_t) * item->value.vtable_slot));
+#endif
 				}
 				mips_jr (code, mips_t9);
 				mips_nop (code);
@@ -5401,8 +5415,13 @@ mono_arch_build_imt_trampoline (MonoVTable *vtable, MonoDomain *domain, MonoIMTC
 					patch = code;
 					ppc_bc (code, PPC_BR_FALSE, PPC_BR_EQ, 0);
 #endif
+#if _MIPS_SIM == _ABIO32
 					mips_lw (code, mips_t9, mips_t7,
 						 (sizeof (target_mgreg_t) * item->value.vtable_slot));
+#else
+					mips_lw (code, mips_t9, mips_t3,
+						 (sizeof (target_mgreg_t) * item->value.vtable_slot));
+#endif
 					mips_jr (code, mips_t9);
 					mips_nop (code);
 

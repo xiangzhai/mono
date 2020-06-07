@@ -4391,6 +4391,21 @@ case "$host" in
 		   AC_SUBST(INTERP_CFLAGS)
 		fi
 		;;
+	mips64*)
+		TARGET=MIPS64;
+		arch_target=mips64;
+		with_tls=pthread;
+		ACCESS_UNALIGNED="no"
+
+		AC_MSG_CHECKING(for mips n64)
+		AC_TRY_COMPILE([],[
+		],[
+		AC_MSG_RESULT(yes)
+		sizeof_register=8
+		],[
+		AC_MSG_RESULT(no)
+		])
+		;;
 	mips*)
 		TARGET=MIPS;
 		arch_target=mips;
@@ -4800,6 +4815,9 @@ S390X)
 MIPS)
 	AC_DEFINE(TARGET_MIPS, 1, [...])
 	;;
+MIPS64)
+	AC_DEFINE(TARGET_MIPS64, 1, [...])
+	;;
 SPARC)
 	AC_DEFINE(TARGET_SPARC, 1, [...])
 	;;
@@ -4856,6 +4874,9 @@ S390X)
 	;;
 MIPS)
 	AC_DEFINE(HOST_MIPS, 1, [...])
+	;;
+MIPS64)
+	AC_DEFINE(HOST_MIPS64, 1, [...])
 	;;
 SPARC)
 	AC_DEFINE(HOST_SPARC, 1, [...])
@@ -4926,7 +4947,7 @@ fi
 dnl Use GCC atomic ops if they work on the target.
 if test x$GCC = "xyes"; then
 	case $TARGET in
-	X86 | AMD64 | ARM | ARM64 | ARM6432 | POWERPC | POWERPC64 | MIPS | S390X | SPARC | SPARC64 | RISCV32 | RISCV64)
+	X86 | AMD64 | ARM | ARM64 | ARM6432 | POWERPC | POWERPC64 | MIPS | MIPS64 | S390X | SPARC | SPARC64 | RISCV32 | RISCV64)
 		AC_DEFINE(USE_GCC_ATOMIC_OPS, 1, [...])
 		;;
 	esac
@@ -6062,6 +6083,7 @@ AM_CONDITIONAL(SPARC64, test x$TARGET = xSPARC64)
 AM_CONDITIONAL(X86, test x$TARGET = xX86)
 AM_CONDITIONAL(AMD64, test x$TARGET = xAMD64)
 AM_CONDITIONAL(MIPS, test x$TARGET = xMIPS)
+AM_CONDITIONAL(MIPS64, test x$TARGET = xMIPS64)
 AM_CONDITIONAL(POWERPC, test x$TARGET = xPOWERPC)
 AM_CONDITIONAL(POWERPC64, test x$TARGET = xPOWERPC64)
 AM_CONDITIONAL(ARM, test x$TARGET = xARM)

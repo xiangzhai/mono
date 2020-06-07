@@ -246,8 +246,13 @@ gpointer  mono_aot_get_method               (MonoDomain *domain,
 											 MonoMethod *method, MonoError *error);
 gpointer  mono_aot_get_method_from_token    (MonoDomain *domain, MonoImage *image, guint32 token, MonoError *error);
 gboolean  mono_aot_is_got_entry             (guint8 *code, guint8 *addr);
+#ifndef DISABLE_AOT
 guint8*   mono_aot_get_plt_entry            (host_mgreg_t *regs, guint8 *code);
 guint32   mono_aot_get_plt_info_offset      (gpointer aot_module, guint8 *plt_entry, host_mgreg_t *regs, guint8 *code);
+#else
+guint8*   mono_aot_get_plt_entry            (guint8 *code);
+guint32   mono_aot_get_plt_info_offset      (host_mgreg_t *regs, guint8 *code);
+#endif
 gboolean  mono_aot_get_cached_class_info    (MonoClass *klass, MonoCachedClassInfo *res);
 gboolean  mono_aot_get_class_from_name      (MonoImage *image, const char *name_space, const char *name, MonoClass **klass);
 MonoJitInfo* mono_aot_find_jit_info         (MonoDomain *domain, MonoImage *image, gpointer addr);
@@ -273,7 +278,11 @@ gboolean mono_aot_is_pagefault              (void *ptr);
 void     mono_aot_handle_pagefault          (void *ptr);
 
 guint32  mono_aot_find_method_index         (MonoMethod *method);
+#ifndef DISABLE_AOT
 gboolean mono_aot_init_llvm_method          (gpointer aot_module, gpointer method_info, MonoClass *init_class, MonoError *error);
+#else
+void     mono_aot_init_llvm_method          (gpointer aot_module, guint32 method_index);
+#endif
 GHashTable *mono_aot_get_weak_field_indexes (MonoImage *image);
 MonoAotMethodFlags mono_aot_get_method_flags (guint8 *code);
 

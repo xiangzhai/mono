@@ -26,7 +26,7 @@ enum {
 	mips_t5,
 	mips_t6,
 	mips_t7,
-#elif _MIPS_SIM == _ABIN32
+#elif _MIPS_SIM == _ABIN32 || _MIPS_SIM == _ABI64
 	mips_a4, /* 4 more argument registers */
 	mips_a5,
 	mips_a6,

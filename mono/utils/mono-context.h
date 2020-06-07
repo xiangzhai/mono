@@ -870,6 +870,64 @@ typedef struct {
 		: "memory"			\
 	)
 
+#elif ((defined(__mips64__) && !defined(MONO_CROSS_COMPILE)) || (defined(TARGET_MIPS64))) && SIZEOF_REGISTER == 8
+
+#define MONO_ARCH_HAS_MONO_CONTEXT 1
+
+#include <mono/arch/mips/mips-codegen.h>
+
+typedef struct {
+	host_mgreg_t	    sc_pc;
+	host_mgreg_t		sc_regs [32];
+	gfloat		sc_fpregs [32];
+} MonoContext;
+
+#define MONO_CONTEXT_SET_IP(ctx,ip) do { (ctx)->sc_pc = (host_mgreg_t)(gsize)(ip); } while (0);
+#define MONO_CONTEXT_SET_BP(ctx,bp) do { (ctx)->sc_regs[mips_fp] = (host_mgreg_t)(gsize)(bp); } while (0);
+#define MONO_CONTEXT_SET_SP(ctx,sp) do { (ctx)->sc_regs[mips_sp] = (host_mgreg_t)(gsize)(sp); } while (0);
+
+#define MONO_CONTEXT_GET_IP(ctx) ((gpointer)(gsize)((ctx)->sc_pc))
+#define MONO_CONTEXT_GET_BP(ctx) ((gpointer)(gsize)((ctx)->sc_regs[mips_fp]))
+#define MONO_CONTEXT_GET_SP(ctx) ((gpointer)(gsize)((ctx)->sc_regs[mips_sp]))
+
+#define MONO_CONTEXT_GET_CURRENT(ctx)	\
+	__asm__ __volatile__(	\
+		"sw $0,0(%0)\n\t"	\
+		"sw $1,4(%0)\n\t"	\
+		"sw $2,8(%0)\n\t"	\
+		"sw $3,12(%0)\n\t"	\
+		"sw $4,16(%0)\n\t"	\
+		"sw $5,20(%0)\n\t"	\
+		"sw $6,24(%0)\n\t"	\
+		"sw $7,28(%0)\n\t"	\
+		"sw $8,32(%0)\n\t"	\
+		"sw $9,36(%0)\n\t"	\
+		"sw $10,40(%0)\n\t"	\
+		"sw $11,44(%0)\n\t"	\
+		"sw $12,48(%0)\n\t"	\
+		"sw $13,52(%0)\n\t"	\
+		"sw $14,56(%0)\n\t"	\
+		"sw $15,60(%0)\n\t"	\
+		"sw $16,64(%0)\n\t"	\
+		"sw $17,68(%0)\n\t"	\
+		"sw $18,72(%0)\n\t"	\
+		"sw $19,76(%0)\n\t"	\
+		"sw $20,80(%0)\n\t"	\
+		"sw $21,84(%0)\n\t"	\
+		"sw $22,88(%0)\n\t"	\
+		"sw $23,92(%0)\n\t"	\
+		"sw $24,96(%0)\n\t"	\
+		"sw $25,100(%0)\n\t"	\
+		"sw $26,104(%0)\n\t"	\
+		"sw $27,108(%0)\n\t"	\
+		"sw $28,112(%0)\n\t"	\
+		"sw $29,116(%0)\n\t"	\
+		"sw $30,120(%0)\n\t"	\
+		"sw $31,124(%0)\n\t"	\
+		: : "r" (&(ctx).sc_regs [0])	\
+		: "memory"			\
+	)
+
 #elif defined(__s390x__)
 
 #define MONO_ARCH_HAS_MONO_CONTEXT 1

@@ -1429,7 +1429,7 @@ MINI_OP(OP_S390_CGIJ,           "s390_cgij", LREG, NONE, NONE)
 MINI_OP(OP_S390_CLGIJ,          "s390_cgij_un", LREG, NONE, NONE)
 #endif
 
-#if defined(TARGET_MIPS)
+#if defined(TARGET_MIPS) || defined(TARGET_MIPS64)
 MINI_OP(OP_MIPS_BEQ,   "mips_beq", NONE, IREG, IREG)
 MINI_OP(OP_MIPS_BGEZ,  "mips_bgez", NONE, IREG, NONE)
 MINI_OP(OP_MIPS_BGTZ,  "mips_bgtz", NONE, IREG, NONE)

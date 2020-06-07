@@ -384,6 +384,12 @@ mips_sources = \
 	exceptions-mips.c	\
 	tramp-mips.c
 
+mips64_sources = \
+	mini-mips.c		\
+	mini-mips.h		\
+	exceptions-mips.c	\
+	tramp-mips.c
+
 sparc_sources = \
 	mini-sparc.c		\
 	mini-sparc.h		\
@@ -645,6 +651,13 @@ arch_define=__mips__
 target_define=TARGET_MIPS
 endif
 
+if MIPS64
+arch_sources = $(mips64_sources)
+arch_built=cpu-mips64.h
+arch_define=__mips64__
+target_define=TARGET_MIPS64
+endif
+
 if ARM
 # pick up arm_dpimacros.h
 ARCH_CFLAGS = -I../arch/arm
@@ -860,6 +873,9 @@ cpu-s390x.h: mini-ops.h cpu-s390x.md $(srcdir)/genmdesc.py
 
 cpu-mips.h: mini-ops.h cpu-mips.md $(srcdir)/genmdesc.py
 	$(GENMDESC_PRG) cpu-mips.h mips_desc $(srcdir)/cpu-mips.md
+
+cpu-mips64.h: mini-ops.h cpu-mips64.md $(srcdir)/genmdesc.py
+	$(GENMDESC_PRG) cpu-mips64.h mips_desc $(srcdir)/cpu-mips64.md
 
 cpu-riscv32.h: cpu-riscv32.md $(srcdir)/genmdesc.py
 	$(GENMDESC_PRG) cpu-riscv32.h riscv32_cpu_desc $(srcdir)/cpu-riscv32.md
@@ -1081,6 +1097,7 @@ EXTRA_DIST = TestDriver.cs \
 	$(arm_sources) cpu-arm.md 		\
 	$(arm64_sources) cpu-arm64.md 		\
 	$(mips_sources) cpu-mips.md 		\
+	$(mips64_sources) cpu-mips64.md 	\
 	$(sparc_sources) cpu-sparc.md 		\
 	$(s390x_sources) cpu-s390x.md 		\
 	$(riscv_sources) cpu-riscv32.md cpu-riscv64.md \
